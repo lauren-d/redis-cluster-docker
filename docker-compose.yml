@@ -1,0 +1,50 @@
+version: '3.7'
+services:
+  redis-1:
+    image: redis
+    ports:
+      - "7001:7001"
+    volumes:
+      - ./data/redis-node-1.conf:/usr/local/etc/redis/redis.conf
+    command: redis-server /usr/local/etc/redis/redis.conf
+    networks:
+      redis_net:
+          ipv4_address: 10.0.0.2
+  redis-2:
+    image: redis
+    ports:
+      - "7002:7002"
+    volumes:
+      - ./data/redis-node-2.conf:/usr/local/etc/redis/redis.conf
+    command: redis-server /usr/local/etc/redis/redis.conf
+    networks:
+      redis_net:
+          ipv4_address: 10.0.0.3
+  redis-3:
+    image: redis
+    ports:
+      - "7003:7003"
+    volumes:
+      - ./data/redis-node-3.conf:/usr/local/etc/redis/redis.conf
+    command: redis-server /usr/local/etc/redis/redis.conf
+    networks:
+      redis_net:
+          ipv4_address: 10.0.0.4
+  redis-cluster:
+    build:
+      context: .
+    tty: true
+    hostname: server
+    depends_on:
+      - redis-1
+      - redis-2
+      - redis-3
+    networks:
+      - redis_net
+
+networks:
+  redis_net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.0.0.0/16
